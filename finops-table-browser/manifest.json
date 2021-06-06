@@ -4,13 +4,14 @@
     "version": "1.0",
     "manifest_version": 2,
 
-    "browser_action": {
+    "page_action": {
         "browser_style": true,
         "default_popup": "popup/table_browser_pop.html",
         "default_icon": {
             "16": "icons/page-16.png",
             "32": "icons/page-32.png"
-        }
+        },
+        "show_matches": ["https://*.dynamics.com/*"]
     },
 
     "permissions": [
