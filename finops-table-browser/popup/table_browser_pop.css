@@ -1,0 +1,37 @@
+body {
+    width: 450px;
+    padding: 10px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.popup-btn {
+    margin: auto;
+}
+
+.primary {
+    color: white;
+    background-color: #1b6ac9;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 2px;
+    padding: 3px;
+    width: 320px;
+}
+
+.input-group > label {
+    font-weight: 400;
+}
+
+.input-group > input {
+    border: 1px solid;
+    border-radius: 3px;
+    flex-basis: 61.75%;
+}
+
+#finopsUrl {
+    flex-basis: 70%;
+}
