@@ -1,7 +1,10 @@
+
+const urlRegex = new RegExp(/^http(s)?:\/\/.+\.com/gm);
+
 document.getElementById("submit-btn").addEventListener("click", function(e) {
     
-    browser.tabs.query({currentWindow: true, active: true}).then((t) => {
-        const finopsUrl = t[0].url;
+    function createTableBrowserTab(dynamicsUrl) {
+        const finopsUrl = dynamicsUrl.match(urlRegex)[0];
         const company = document.getElementById("company").value;
         const tableName = document.getElementById("tableName").value;
     
@@ -23,6 +26,10 @@ document.getElementById("submit-btn").addEventListener("click", function(e) {
     
         browser.tabs.create({
             url: urlTemplate
-        }); 
+        });
+    }
+
+    browser.tabs.query({currentWindow: true, active: true}).then((t) => {
+        createTableBrowserTab(t[0].url);
     });
 });
