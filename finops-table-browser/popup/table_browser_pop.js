@@ -1,5 +1,34 @@
 
 const urlRegex = new RegExp(/^http(s)?:\/\/.+\.com/gm);
+const queryParamsRegex = new RegExp(/.*\?(.*)/gm);
+
+document.onreadystatechange = function() {
+
+    function getQueryParams(url) {
+        const queryString = queryParamsRegex.exec(url)[1];
+
+        return queryString.split('&').reduce((acc, exp) => {
+            [key, value] = exp.split('=');
+            acc[key] = value;
+            return acc;
+        }, {});
+    }
+
+    if (document.readyState === "complete") {
+        browser.tabs.query({currentWindow: true,active: true}).then((t) => {
+            var url = t[0].url;
+            var queryParams = getQueryParams(url);
+            console.log(queryParams);
+
+            const currentCompany = queryParams["cmp"];
+
+            const company = document.getElementById("company");
+
+            company.value = currentCompany ?? "";
+
+        });
+    }
+}
 
 document.getElementById("submit-btn").addEventListener("click", function(e) {
     
