@@ -2,6 +2,8 @@
 const urlRegex = new RegExp(/^http(s)?:\/\/.+\.com/gm);
 const queryParamsRegex = new RegExp(/.*\?(.*)/gm);
 
+let body = document.getElementsByTagName("body")[0];
+
 document.onreadystatechange = function() {
 
     function getQueryParams(url) {
@@ -61,4 +63,10 @@ document.getElementById("submit-btn").addEventListener("click", function(e) {
     browser.tabs.query({currentWindow: true, active: true}).then((t) => {
         createTableBrowserTab(t[0].url);
     });
+});
+
+document.getElementById("theme-toggle").addEventListener("change", function(e) {
+    let isDark = e.target.checked; 
+    console.log(isDark);
+    isDark ? body.setAttribute("data-theme", "dark") : body.removeAttribute("data-theme");
 });

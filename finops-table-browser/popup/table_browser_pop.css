@@ -1,7 +1,30 @@
+
+:root, [data-theme="default"] {
+    --body-bg-color: white;
+    --input-bg-color: white;
+    --text-color: black;
+    --input-text-color: black;
+}
+
+[data-theme="dark"] {
+    --body-bg-color: #262626;
+    --input-bg-color: #595959;
+    --text-color: whitesmoke;
+    --input-text-color: white;
+}
+
 body {
     width: 450px;
     padding: 10px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: var(--text-color);
+    background-color: var(--body-bg-color);
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .popup-btn {
@@ -11,6 +34,9 @@ body {
 .primary {
     color: white;
     background-color: #1b6ac9;
+    border: 2px #1b6ac9 solid;
+    border-radius: 5px;
+    padding: 5px 7.5px;
 }
 
 .input-group {
@@ -30,8 +56,90 @@ body {
     border: 1px solid;
     border-radius: 3px;
     flex-basis: 61.75%;
+    background-color: var(--input-bg-color);
+    color: var(--input-text-color);
 }
 
 #finopsUrl {
     flex-basis: 70%;
 }
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(30px);
+    -ms-transform: translateX(30px);
+    transform: translateX(30px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 32px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+  .slider > .row {
+      width: 52px;
+      margin: 5px 0 0 4px;
+      /* justify-content: space-evenly; */
+  }
+
+  .slider span {
+    width: 20px;
+    height: 20px;
+  }
+
+  .slider span.dark {
+    background: url(../icons/moon-icon-filled-white-border-20.png) no-repeat center center;
+  }
+
+  .slider span.light {
+    background: url(../icons/sun-icon-filled-20.png) no-repeat center center;
+  }

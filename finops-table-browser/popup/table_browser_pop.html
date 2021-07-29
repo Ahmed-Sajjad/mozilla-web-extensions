@@ -5,7 +5,18 @@
     <link rel="stylesheet" type="text/css" media="screen" href="table_browser_pop.css">
 </head>
 <body>
-    <h2>FinOps Table Browser</h2>
+    <div class="row">
+        <h2>FinOps Table Browser</h2>
+        <label class="switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider round">
+                <div class="row">
+                    <span class="dark"></span>
+                    <span class="light"></span>
+                </div>
+            </span>
+        </label>
+    </div>
     <div class="input-group">
         <label name="company">Company:</label>
         <input name="company" id="company" type="text">
