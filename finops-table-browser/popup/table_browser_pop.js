@@ -25,7 +25,9 @@ document.getElementById("theme-toggle").addEventListener("change", toggleTheme);
     const companyValue      = company.value;
     const tableNameValue    = tableName.value;
 
-    if (!finopsUrl || !company || !tableName) return;
+    if (!finopsUrl || !companyValue || !tableNameValue) {
+        return;
+    }
 
     var urlTemplate = "{{finopsUrl}}/?cmp={{company}}&mi=SysTableBrowser&tableName={{tableName}}";
 
