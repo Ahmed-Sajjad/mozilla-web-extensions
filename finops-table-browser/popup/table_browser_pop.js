@@ -1,5 +1,9 @@
 
 const urlRegex = new RegExp(/^http(s)?:\/\/.+\.com/gm);
+
+const bcRegex = new RegExp(/^http(s)?:\/\/businesscentral.+\.com\/.+\?/gm);
+const finOpsRegex = new RegExp(/^http(s)?:\/\/(?!businesscentral).+\.dynamics\.com/gm);
+
 const queryParamsRegex = new RegExp(/.*\?(.*)/gm);
 
 let body      = document.getElementsByTagName("body")[0];
@@ -16,12 +20,30 @@ document.getElementById("theme-toggle").addEventListener("change", toggleTheme);
 
 //#region    Functions
 /**
- * Generates the url for the table browser based on the company and table name
- * @param {string} dynamicsUrl The URL of the Finance and Operations (D365) site
+ * Checks the URL and decide 
+ * @param {string} dynamicsUrl The URL of the Dynamics ERP site
  * @returns 
  */
  function createTableBrowserTab(dynamicsUrl) {
-    const finopsUrl         = dynamicsUrl.match(urlRegex)[0];
+    const bcUrl = dynamicsUrl.match(bcRegex);
+
+    const finopsUrl = dynamicsUrl.match(finOpsRegex);
+
+    if (finopsUrl !== null && finopsUrl !== undefined) {
+        return createTableBrowserTabFinOps(finopsUrl[0]);
+    }
+    else if (bcUrl !== null && bcUrl !== undefined) {
+        return createTableBrowserTabBC(bcUrl[0]);
+    }
+}
+
+/**
+ * Generates the url for the table browser based on the company and table name
+ * @param {*} finopsUrl The URL of the Finance and Operations (D365) site
+ * @returns 
+ */
+function createTableBrowserTabFinOps(finopsUrl) {
+    //const finopsUrl         = dynamicsUrl.match(urlRegex)[0];
     const companyValue      = company.value;
     const tableNameValue    = tableName.value;
 
@@ -34,6 +56,24 @@ document.getElementById("theme-toggle").addEventListener("change", toggleTheme);
     urlTemplate = urlTemplate.replace("{{finopsUrl}}", finopsUrl)
                              .replace("{{company}}", companyValue)
                              .replace("{{tableName}}", tableNameValue);
+
+    browser.tabs.create({ url: urlTemplate });
+}
+
+function createTableBrowserTabBC(bcUrl) {
+    //const finopsUrl         = dynamicsUrl.match(urlRegex)[0];
+    const companyValue      = company.value;
+    const tableNameValue    = tableName.value;
+
+    if (!bcUrl || !companyValue || !tableNameValue) {
+        return;
+    }
+
+    var urlTemplate = "{{bcUrl}}company={{company}}&table={{tableId}}";
+
+    urlTemplate = urlTemplate.replace("{{bcUrl}}", bcUrl)
+                             .replace("{{company}}", companyValue)
+                             .replace("{{tableId}}", tableNameValue);
 
     browser.tabs.create({ url: urlTemplate });
 }
@@ -68,13 +108,19 @@ function handleSubmit(event) {
  function onDocumentReady() {
     if (document.readyState === "complete")
     {
+        // console.log(window.matchMedia);
+        // console.log(window.matchMedia('(prefers-color-scheme: dark)'));
+        // console.log(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (isDark) {
+            document.getElementById("theme-toggle").click();
+        }
+
         browser.tabs.query({ currentWindow: true,active: true }).then((t) => {
             var url = t[0].url;
             var queryParams = getQueryParams(url);
 
-            const currentCompany = queryParams["cmp"];
-
-            company.value = currentCompany ?? "";
+            company.value = queryParams["cmp"] ?? queryParams["company"] ?? "";
         });
     }
 }
@@ -84,8 +130,10 @@ function handleSubmit(event) {
  * @param {Event} event 
  */
 function toggleTheme(event) {
-    let isDark = event.target.checked; 
-    
+    setDarkMode(event.target.checked);
+}
+
+function setDarkMode(isDark) {
     isDark ? body.setAttribute("data-theme", "dark") : body.removeAttribute("data-theme");
 }
 //#endregion Functions

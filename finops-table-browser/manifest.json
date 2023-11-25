@@ -1,6 +1,6 @@
 {
-    "name": "FinOps Table Browser",
-    "description": "Opens the table browser for the Dynamics Finance and Operations",
+    "name": "Dynamics 365 Table Browser",
+    "description": "Opens the table browser for the Dynamics Finance and Operations and Business Central",
     "version": "1.0",
     "manifest_version": 2,
 
