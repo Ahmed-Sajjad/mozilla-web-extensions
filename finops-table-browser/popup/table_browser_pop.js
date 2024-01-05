@@ -1,33 +1,79 @@
 
-const urlRegex = new RegExp(/^http(s)?:\/\/.+\.com/gm);
-
-const bcRegex = new RegExp(/^http(s)?:\/\/businesscentral.+\.com\/.+\?/gm);
-const finOpsRegex = new RegExp(/^http(s)?:\/\/(?!businesscentral).+\.dynamics\.com/gm);
-
-const queryParamsRegex = new RegExp(/.*\?(.*)/gm);
-
 let body      = document.getElementsByTagName("body")[0];
-let company   = document.getElementById("company");
-let tableName = document.getElementById("tableName");
+let company   = document.getElementById(ElementIds.COMPANY);
+let tableName = document.getElementById(ElementIds.TABLE_NAME);
 
 //#region    Event handlers
+
+//#region   On Document Ready
 document.onreadystatechange = onDocumentReady
+/**
+ * Function that performs operations when the document is ready 
+ */
+function onDocumentReady() {
+    if (document.readyState === "complete")
+    {
+        if (isDark()) {
+            document.getElementById(ElementIds.THEME_TOGGLE).click();
+        }
 
-document.getElementById("submit-btn").addEventListener("click", handleSubmit);
+        browser.tabs.query({ 
+                              currentWindow: true,
+                              active: true 
+                           })
+                    .then((t) => {
+            var url = t[0].url;
+            var queryParams = getQueryParams(url);
 
-document.getElementById("theme-toggle").addEventListener("change", toggleTheme);
+            company.value = queryParams["cmp"] 
+                         ?? queryParams["company"] 
+                         ?? "";
+        });
+    }
+}
+//#endregion   On Document Ready
+
+//#region   Handle Submit
+document.getElementById(ElementIds.SUBMIT_BUTTON)
+        .addEventListener("click", handleSubmit);
+/**
+ * Handles the submit button event
+ * @param {Event} event 
+ */
+function handleSubmit(event) {
+    browser.tabs.query({ 
+                          currentWindow: true, 
+                          active: true 
+                       })
+                .then((t) => createTableBrowserTab(t[0].url));
+}
+//#endregion   Handle Submit
+
+//#region   Toggle Theme
+document.getElementById(ElementIds.THEME_TOGGLE)
+        .addEventListener("change", toggleTheme);
+/**
+ * Toggles the theme from light to dark or vice versa
+ * @param {Event} event 
+ */
+function toggleTheme(event) {
+    setDarkMode(event.target.checked);
+}
+//#endregion   Toggle Theme
+
 //#endregion Event handlers
 
 //#region    Functions
+
 /**
  * Checks the URL and decide 
  * @param {string} dynamicsUrl The URL of the Dynamics ERP site
  * @returns 
  */
- function createTableBrowserTab(dynamicsUrl) {
-    const bcUrl = dynamicsUrl.match(bcRegex);
+function createTableBrowserTab(dynamicsUrl) {
+    const bcUrl = dynamicsUrl.match(Regex.BUSINESS_CENTRAL);
 
-    const finopsUrl = dynamicsUrl.match(finOpsRegex);
+    const finopsUrl = dynamicsUrl.match(Regex.FINOPS);
 
     if (finopsUrl !== null && finopsUrl !== undefined) {
         return createTableBrowserTabFinOps(finopsUrl[0]);
@@ -43,7 +89,9 @@ document.getElementById("theme-toggle").addEventListener("change", toggleTheme);
  * @returns 
  */
 function createTableBrowserTabFinOps(finopsUrl) {
-    //const finopsUrl         = dynamicsUrl.match(urlRegex)[0];
+    
+    let keywords = FinanceAndOperations.Keywords;
+
     const companyValue      = company.value;
     const tableNameValue    = tableName.value;
 
@@ -51,17 +99,23 @@ function createTableBrowserTabFinOps(finopsUrl) {
         return;
     }
 
-    var urlTemplate = "{{finopsUrl}}/?cmp={{company}}&mi=SysTableBrowser&tableName={{tableName}}";
-
-    urlTemplate = urlTemplate.replace("{{finopsUrl}}", finopsUrl)
-                             .replace("{{company}}", companyValue)
-                             .replace("{{tableName}}", tableNameValue);
+    urlTemplate = FinanceAndOperations.URL_TEMPLATE
+                                      .replace(keywords.FINOPS_URL, finopsUrl)
+                                      .replace(keywords.COMPANY, companyValue)
+                                      .replace(keywords.TABLE_NAME, tableNameValue);
 
     browser.tabs.create({ url: urlTemplate });
 }
 
+/**
+ * Generates the url for the table browser based on the company and table id
+ * @param {*} bcUrl The URL of the Business Central site
+ * @returns 
+ */
 function createTableBrowserTabBC(bcUrl) {
-    //const finopsUrl         = dynamicsUrl.match(urlRegex)[0];
+    
+    let keywords = BusinessCentral.Keywords;
+
     const companyValue      = company.value;
     const tableNameValue    = tableName.value;
 
@@ -69,71 +123,12 @@ function createTableBrowserTabBC(bcUrl) {
         return;
     }
 
-    var urlTemplate = "{{bcUrl}}company={{company}}&table={{tableId}}";
-
-    urlTemplate = urlTemplate.replace("{{bcUrl}}", bcUrl)
-                             .replace("{{company}}", companyValue)
-                             .replace("{{tableId}}", tableNameValue);
+    urlTemplate = BusinessCentral.URL_TEMPLATE
+                                 .replace(keywords.BC_URL, bcUrl)
+                                 .replace(keywords.COMPANY, companyValue)
+                                 .replace(keywords.TABLE_ID, tableNameValue);
 
     browser.tabs.create({ url: urlTemplate });
 }
 
-/**
- * Extracts the query params from the provided url
- * @param {string} url 
- * @returns 
- */
-function getQueryParams(url) {
-    const queryString = queryParamsRegex.exec(url)[1];
-
-    return queryString.split('&').reduce((acc, exp) => {
-        [key, value] = exp.split('=');
-        acc[key] = value;
-        return acc;
-    }, {});
-}
-
-/**
- * Handles the submit button event
- * @param {Event} event 
- */
-function handleSubmit(event) {
-    browser.tabs.query({ currentWindow: true, active: true })
-                .then((t) => createTableBrowserTab(t[0].url));
-}
-
-/**
- * Function that performs operations when the document is ready 
- */
- function onDocumentReady() {
-    if (document.readyState === "complete")
-    {
-        // console.log(window.matchMedia);
-        // console.log(window.matchMedia('(prefers-color-scheme: dark)'));
-        // console.log(window.matchMedia('(prefers-color-scheme: dark)').matches);
-        const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (isDark) {
-            document.getElementById("theme-toggle").click();
-        }
-
-        browser.tabs.query({ currentWindow: true,active: true }).then((t) => {
-            var url = t[0].url;
-            var queryParams = getQueryParams(url);
-
-            company.value = queryParams["cmp"] ?? queryParams["company"] ?? "";
-        });
-    }
-}
-
-/**
- * Toggles the theme from light to dark or vice versa
- * @param {Event} event 
- */
-function toggleTheme(event) {
-    setDarkMode(event.target.checked);
-}
-
-function setDarkMode(isDark) {
-    isDark ? body.setAttribute("data-theme", "dark") : body.removeAttribute("data-theme");
-}
 //#endregion Functions
