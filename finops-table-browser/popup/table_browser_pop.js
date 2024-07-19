@@ -1,6 +1,6 @@
 
-let body      = document.getElementsByTagName("body")[0];
-let company   = document.getElementById(ElementIds.COMPANY);
+let body = document.getElementsByTagName("body")[0];
+let company = document.getElementById(ElementIds.COMPANY);
 let tableName = document.getElementById(ElementIds.TABLE_NAME);
 
 //#region    Event handlers
@@ -11,23 +11,18 @@ document.onreadystatechange = onDocumentReady
  * Function that performs operations when the document is ready 
  */
 function onDocumentReady() {
-    if (document.readyState === "complete")
-    {
+    if (document.readyState === "complete") {
         if (isDark()) {
             document.getElementById(ElementIds.THEME_TOGGLE).click();
         }
 
-        browser.tabs.query({ 
-                              currentWindow: true,
-                              active: true 
-                           })
-                    .then((t) => {
+        getCurrentTab(function(t) {
             var url = t[0].url;
             var queryParams = getQueryParams(url);
 
-            company.value = queryParams["cmp"] 
-                         ?? queryParams["company"] 
-                         ?? "";
+            company.value = queryParams["cmp"]
+                ?? queryParams["company"]
+                ?? "";
         });
     }
 }
@@ -35,23 +30,21 @@ function onDocumentReady() {
 
 //#region   Handle Submit
 document.getElementById(ElementIds.SUBMIT_BUTTON)
-        .addEventListener("click", handleSubmit);
+    .addEventListener("click", handleSubmit);
 /**
  * Handles the submit button event
  * @param {Event} event 
  */
 function handleSubmit(event) {
-    browser.tabs.query({ 
-                          currentWindow: true, 
-                          active: true 
-                       })
-                .then((t) => createTableBrowserTab(t[0].url));
+    getCurrentTab(function (t) { 
+        createTableBrowserTab(t[0].url);
+    });
 }
 //#endregion   Handle Submit
 
 //#region   Toggle Theme
 document.getElementById(ElementIds.THEME_TOGGLE)
-        .addEventListener("change", toggleTheme);
+    .addEventListener("change", toggleTheme);
 /**
  * Toggles the theme from light to dark or vice versa
  * @param {Event} event 
@@ -89,22 +82,22 @@ function createTableBrowserTab(dynamicsUrl) {
  * @returns 
  */
 function createTableBrowserTabFinOps(finopsUrl) {
-    
+
     let keywords = FinanceAndOperations.Keywords;
 
-    const companyValue      = company.value;
-    const tableNameValue    = tableName.value;
+    const companyValue = company.value;
+    const tableNameValue = tableName.value;
 
     if (!finopsUrl || !companyValue || !tableNameValue) {
         return;
     }
 
     urlTemplate = FinanceAndOperations.URL_TEMPLATE
-                                      .replace(keywords.FINOPS_URL, finopsUrl)
-                                      .replace(keywords.COMPANY, companyValue)
-                                      .replace(keywords.TABLE_NAME, tableNameValue);
+        .replace(keywords.FINOPS_URL, finopsUrl)
+        .replace(keywords.COMPANY, companyValue)
+        .replace(keywords.TABLE_NAME, tableNameValue);
 
-    browser.tabs.create({ url: urlTemplate });
+    openUrlInNewTab(urlTemplate);
 }
 
 /**
@@ -113,22 +106,22 @@ function createTableBrowserTabFinOps(finopsUrl) {
  * @returns 
  */
 function createTableBrowserTabBC(bcUrl) {
-    
+
     let keywords = BusinessCentral.Keywords;
 
-    const companyValue      = company.value;
-    const tableNameValue    = tableName.value;
+    const companyValue = company.value;
+    const tableNameValue = tableName.value;
 
     if (!bcUrl || !companyValue || !tableNameValue) {
         return;
     }
 
     urlTemplate = BusinessCentral.URL_TEMPLATE
-                                 .replace(keywords.BC_URL, bcUrl)
-                                 .replace(keywords.COMPANY, companyValue)
-                                 .replace(keywords.TABLE_ID, tableNameValue);
+        .replace(keywords.BC_URL, bcUrl)
+        .replace(keywords.COMPANY, companyValue)
+        .replace(keywords.TABLE_ID, tableNameValue);
 
-    browser.tabs.create({ url: urlTemplate });
+    openUrlInNewTab(urlTemplate);
 }
 
 //#endregion Functions
