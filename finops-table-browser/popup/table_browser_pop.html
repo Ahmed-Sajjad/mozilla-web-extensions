@@ -23,8 +23,11 @@
     </div>
     <div class="input-group">
         <label name="table-name">Table name:</label>
-        <input name="table-name" id="tableName" type="text">
+        <input name="table-name" id="tableName" type="text" list="tableNames" autofocus>
+        <datalist id="tableNames">
+        </datalist>
     </div>
+    
     <button id="submit-btn" class="popup-btn primary">Open Table Browser</button>
     <script type="text/javascript" src="table_browser_pop.js"></script>
 </body>
