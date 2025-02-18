@@ -154,3 +154,7 @@ body {
   .slider span.light {
     background: url(../icons/sun-icon-filled-20.png) no-repeat center center;
   }
+
+  #submit-btn{
+    margin-top: 8px;
+  }

@@ -61,6 +61,26 @@ function toggleTheme(event) {
 }
 //#endregion   Toggle Theme
 
+document.getElementById("tableName").addEventListener("keypress", function (event) {
+
+    /// Trigger the click event on enter press  
+    if (event.key === 'Enter') {
+
+        if (visitedPages.length > 5) {
+            visitedPages.shift();
+        }
+
+        visitedPages.push(document.getElementById("tableName").value);
+        localStorage.setItem("visitedPages", JSON.stringify(visitedPages));
+        updateRecentList();
+        document.getElementById("submit-btn").click();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    updateRecentList();   
+});
+
 //#endregion Event handlers
 
 //#region    Functions
@@ -131,4 +151,26 @@ function createTableBrowserTabBC(bcUrl) {
     browser.tabs.create({ url: urlTemplate });
 }
 
+function updateRecentList() {
+    const dataList = document.getElementById('tableNames');
+
+    let pages = localStorage.getItem("visitedPages");
+
+    console.log(pages);
+    if (pages !== null) {
+        visitedPages = JSON.parse(pages);
+
+        dataList.innerHTML = '';
+
+        visitedPages.reverse();
+        // Populate datalist with new options
+        visitedPages.forEach(function (name) {
+            const option = document.createElement('option');
+            option.value = name;
+            dataList.appendChild(option);
+        });
+        visitedPages.reverse();
+    }
+}
 //#endregion Functions
+
